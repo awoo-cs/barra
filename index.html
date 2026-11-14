@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Barra">
+<meta name="theme-color" content="#0f1115">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Barra</title>
+<style>
+:root{--bg:#0f1115;--card:#1a1d24;--line:#2a2f3a;--tx:#eef0f4;--mut:#9aa3b2;--acc:#f5b301;--ok:#3ecf8e;--warn:#ff9f1c;--bad:#ff5c5c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+body{padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 92px)}
+header{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 12px}
+header h1{font-size:20px;margin:0}
+header button{background:var(--card);border:1px solid var(--line);color:var(--tx);border-radius:12px;padding:10px 14px;font-size:15px}
+nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#0b0d11ee;border-top:1px solid var(--line);padding:8px 6px calc(env(safe-area-inset-bottom) + 8px);backdrop-filter:blur(8px);z-index:9}
+nav button{background:none;border:0;color:var(--mut);font-size:11px;font-weight:600;padding:6px 0;border-radius:12px}
+nav button span{display:block;font-size:22px;margin-bottom:2px}
+nav button.on{color:#111;background:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h2{font-size:16px;margin:0 0 10px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
+input,textarea{width:100%;padding:12px;font-size:20px;border-radius:12px;border:1px solid var(--line);background:#0c0e12;color:var(--tx);font-family:inherit}
+textarea{font-size:13px;min-height:90px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.g3 input{font-size:18px;padding:11px 8px}
+.mb{margin-bottom:10px}
+.mut{color:var(--mut);font-size:13px;line-height:1.45}
+.big{font-size:36px;font-weight:800;color:var(--acc);line-height:1.15}
+.btn{display:block;width:100%;padding:15px;border-radius:14px;border:0;background:var(--acc);color:#111;font-size:16px;font-weight:700;margin-top:10px}
+.btn.g{background:transparent;color:var(--tx);border:1px solid var(--line)}
+.btn.r{background:transparent;color:var(--bad);border:1px solid #5a2a2a}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:12px 6px;border-radius:12px;border:1px solid var(--line);background:#0c0e12;color:var(--mut);font-size:14px;font-weight:600}
+.seg button.on{background:var(--acc);color:#111;border-color:var(--acc)}
+.steps{margin:0;padding:0;list-style:none}
+.steps li{padding:9px 0;border-bottom:1px dashed var(--line);font-size:15px;line-height:1.45}
+.steps li:last-child{border-bottom:0}
+.steps b{color:var(--acc)}
+.light{display:flex;gap:12px;align-items:center;border-radius:16px;padding:16px;margin-bottom:12px;font-weight:700}
+.light .dot{width:46px;height:46px;border-radius:50%;flex:none}
+.light.verde{background:#12301f;border:1px solid #2a6b47}.light.verde .dot{background:var(--ok)}
+.light.naranja{background:#33240f;border:1px solid #7a5216}.light.naranja .dot{background:var(--warn)}
+.light.rojo{background:#341515;border:1px solid #7a2a2a}.light.rojo .dot{background:var(--bad)}
+.light .t1{font-size:22px}.light .t2{font-size:14px;font-weight:500;color:#d7dbe3}
+.warn{background:#33240f;border:1px solid #7a5216;color:#ffd08a;border-radius:12px;padding:10px;font-size:13px;margin-top:8px}
+.banner{background:#1d2633;border:1px solid #33465f;border-radius:16px;padding:12px;margin-bottom:12px;font-size:14px;line-height:1.45}
+.banner .btn{padding:12px;font-size:15px;margin-top:8px}
+pre{white-space:pre-wrap;background:#0c0e12;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14px;margin:0;font-family:ui-monospace,Menlo,monospace}
+.hide{display:none!important}
+details.card summary{list-style:none;font-weight:700;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary::after{content:'＋';color:var(--mut);font-weight:400}
+details.card[open] summary::after{content:'－'}
+details.card[open] summary{margin-bottom:10px}
+.mv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.mv button{background:none;border:0;color:var(--bad);font-size:13px;padding:6px}
+/* vuelto */
+.prod{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prod .nm{flex:1;font-size:16px;font-weight:600}
+.prod .nm small{display:block;color:var(--mut);font-weight:400;font-size:12px}
+.prod button{width:58px;height:58px;border-radius:16px;border:1px solid var(--line);background:#0c0e12;color:var(--tx);font-size:28px;font-weight:700}
+.prod button.p{background:var(--acc);color:#111;border-color:var(--acc)}
+.prod .q{width:44px;text-align:center;font-size:26px;font-weight:800}
+.bills{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bills button{padding:16px 0;border-radius:14px;border:1px solid var(--line);background:#0c0e12;color:var(--tx);font-size:18px;font-weight:700}
+.vu{text-align:center;padding:6px 0}
+.vu .lab{color:var(--mut);font-size:14px}
+.vu .num{font-size:56px;font-weight:900;color:var(--ok);line-height:1.05}
+.vu .num.neg{color:var(--bad)}
+/* historial */
+.hi{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;background:#0c0e12}
+.hi .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hi .tt{font-weight:700;font-size:15px}
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;font-weight:700;white-space:nowrap}
+.pill.verde{background:#12301f;color:var(--ok)}.pill.naranja{background:#33240f;color:var(--warn)}.pill.rojo{background:#341515;color:var(--bad)}.pill.n{background:#222833;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--mut);font-weight:600;font-size:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 96px);background:var(--ok);color:#06140c;padding:10px 16px;border-radius:12px;font-weight:700;z-index:20;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="ttl">🍺 Barra</h1>
+  <button onclick="go('hist')">📁 Historial</button>
+</header>
+<div id="upd"></div>
+<div id="banner"></div>
+
+<!-- ============ INICIO ============ -->
+<section id="v-ini">
+  <div class="card">
+    <h2>📅 Fecha del evento</h2>
+    <input type="date" data-k="n.fecha">
+  </div>
+  <div class="card">
+    <h2>📦 Lo que me dejaron</h2>
+    <div class="mut mb">Normalmente son 10 cajas llenas de cada uno, así que ya está puesto. Si hay cajas incompletas o vacías: en <b>Sueltas llenas</b> suma las botellas llenas de esas cajas, y en <b>Cajas en total</b> cuenta todas las cajas (llenas, incompletas y vacías).</div>
+    <label>🍺 Cerveza</label>
+    <div class="g3 mb"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.ini.cerv.c"></div><div><label>+ Sueltas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.ini.cerv.s"></div><div><label>Cajas en total</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.ini.cerv.t"></div></div>
+    <label>🥤 Gaseosa</label>
+    <div class="g3"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.ini.gas.c"></div><div><label>+ Sueltas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.ini.gas.s"></div><div><label>Cajas en total</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.ini.gas.t"></div></div>
+    <div class="mut" id="iniRes" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <h2>💰 Mi plata antes de empezar</h2>
+    <div class="mut mb">Esto es tuyo. La app lo resta al final para que no se te mezcle con la venta. Puedes usar coma o punto para los céntimos.</div>
+    <div class="g2"><div><label>📱 Saldo de Yape ahora</label><input type="text" inputmode="decimal" autocomplete="off" data-k="n.ini.yape" placeholder="S/"></div><div><label>🪙 Sencillo que llevé</label><input type="text" inputmode="decimal" autocomplete="off" data-k="n.ini.sencillo" placeholder="S/"></div></div>
+    <div class="warn">Durante el evento no uses tu Yape para cosas personales, o la cuenta se descuadra.</div>
+  </div>
+  <button class="btn r" onclick="nuevaNoche(this)">🧹 Empezar noche nueva (borra lo de hoy)</button>
+</section>
+
+<!-- ============ CENA ============ -->
+<section id="v-cena" class="hide">
+  <div class="card">
+    <h2>🍗 Gaseosas para la cena</h2>
+    <div class="g2 mb"><div><label>Personas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.cena.p" placeholder="178"></div><div><label>Adicionales</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.cena.a" placeholder="0"></div></div>
+    <label>¿De dónde salió el número?</label>
+    <div class="seg" data-seg="n.cena.f"><button data-v="propio">Yo / coordinadora</button><button data-v="dado">Me lo dijeron</button></div>
+  </div>
+  <div class="card" id="cenaRes"></div>
+</section>
+
+<!-- ============ VUELTO ============ -->
+<section id="v-vuelto" class="hide">
+  <div class="card">
+    <div class="prod"><div class="nm">🥤 Gaseosa / Agua / Sporade<small>S/ <span class="pg"></span> c/u</small></div><button onclick="vq('g',-1)">−</button><div class="q" id="qg">0</div><button class="p" onclick="vq('g',1)">+</button></div>
+    <div class="prod" style="margin-bottom:0"><div class="nm">🍺 Cerveza<small>S/ <span class="pc"></span> c/u</small></div><button onclick="vq('c',-1)">−</button><div class="q" id="qc">0</div><button class="p" onclick="vq('c',1)">+</button></div>
+  </div>
+  <div class="card">
+    <div class="g2" style="align-items:end">
+      <div><div class="mut">A cobrar</div><div class="big" id="vTot">S/ 0</div></div>
+      <div><div class="mut">Pagó con</div><div class="big" style="color:var(--tx)" id="vPag">S/ 0</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0"><span class="mut">Toca lo que te da (se suma):</span><button onclick="vPagoReset()" style="background:transparent;border:1px solid #5a2a2a;color:var(--bad);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700">↺ Borrar pago</button></div>
+    <div class="bills">
+      <button onclick="vb(10)">10</button><button onclick="vb(20)">20</button><button onclick="vb(50)">50</button>
+      <button onclick="vb(100)">100</button><button onclick="vb(200)">200</button><button onclick="vb(5)">5</button>
+      <button onclick="vb(1)" style="font-size:15px;color:var(--mut)">🪙 1</button><button onclick="vb(2)" style="font-size:15px;color:var(--mut)">🪙 2</button><button onclick="vUndo()" style="font-size:15px;color:var(--mut)">⟲ Quitar último</button>
+    </div>
+  </div>
+  <div class="card vu">
+    <div class="lab">VUELTO</div>
+    <div class="num" id="vVu">S/ 0</div>
+    <div class="mut" id="vExp" style="margin-top:6px"></div>
+  </div>
+  <button class="btn" onclick="vReset()">✔️ Siguiente cliente</button>
+</section>
+
+<!-- ============ CIERRE ============ -->
+<section id="v-cierre" class="hide">
+  <div class="card">
+    <h2>📦 Lo que quedó</h2>
+    <div class="mut mb">Anota las cajas llenas y, aparte, todas las botellas <b>llenas</b> que estén en cajas incompletas. Si son varias cajas incompletas, la app las junta sola.</div>
+    <label>🍺 Cerveza</label>
+    <div class="g2 mb"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.fin.cerv.c"></div><div><label>Botellas llenas sueltas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.fin.cerv.s"></div></div>
+    <label>🥤 Gaseosa</label>
+    <div class="g2 mb"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.fin.gas.c"></div><div><label>Botellas llenas sueltas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="n.fin.gas.s"></div></div>
+    <label>💧 Agua (opcional)</label>
+    <div class="seg" data-seg="n.fin.agua"><button data-v="si">Sí hay</button><button data-v="no">No hay</button><button data-v="">No poner</button></div>
+  </div>
+  <details class="card" id="movBox-n"><summary id="movSum-n"></summary><div id="movBody-n"></div></details>
+  <div class="card">
+    <h2>💰 La plata al final</h2>
+    <div class="g2"><div><label>📱 Saldo de Yape ahora</label><input type="text" inputmode="decimal" autocomplete="off" data-k="n.fin.yape" placeholder="S/"></div><div><label>💵 Efectivo en mano (todo)</label><input type="text" inputmode="decimal" autocomplete="off" data-k="n.fin.efe" placeholder="S/"></div></div>
+  </div>
+  <div class="card"><h2>🧮 Cómo sale la cuenta</h2><ul class="steps" id="cierreSteps"></ul></div>
+  <div id="cierreLight"></div>
+  <div class="card"><h2>📲 Mensaje para tu jefe</h2><pre id="rep"></pre>
+    <button class="btn" onclick="copiar($('rep').textContent)">📋 Copiar para WhatsApp</button>
+    <button class="btn g" onclick="guardarNoche()">💾 Guardar noche en el historial</button>
+  </div>
+</section>
+
+<!-- ============ AUDITORÍA ============ -->
+<section id="v-aud" class="hide">
+  <div class="card">
+    <h2>🕵️ Auditar a otro vendedor</h2>
+    <button class="btn g" style="margin-top:0" onclick="copiarMiNoche()">📥 Copiar todos mis datos de la noche</button>
+    <div class="mut" style="margin-top:6px">Copia tu inicio, cena, lo que quedó y tu total. Luego cambia lo que sea distinto en su barra.</div>
+    <div style="margin-top:12px"><label>Nombre del vendedor</label><input data-k="a.nombre" autocomplete="off" placeholder="Ej: Juan" style="font-size:18px"></div>
+  </div>
+  <div class="card">
+    <h2>📦 Lo que le dejé</h2>
+    <label>🍺 Cerveza</label>
+    <div class="g2 mb"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.ini.cerv.c"></div><div><label>+ Botellas sueltas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.ini.cerv.s"></div></div>
+    <label>🥤 Gaseosa</label>
+    <div class="g2"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.ini.gas.c"></div><div><label>+ Botellas sueltas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.ini.gas.s"></div></div>
+  </div>
+  <details class="card" id="movBox-a"><summary id="movSum-a"></summary><div id="movBody-a"></div></details>
+  <div class="card">
+    <h2>🍗 Cena en su lado</h2>
+    <div class="g2 mb"><div><label>Personas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.cena.p"></div><div><label>Adicionales</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.cena.a"></div></div>
+    <label>¿De dónde salió el número?</label>
+    <div class="seg" data-seg="a.cena.f"><button data-v="propio">Yo / coordinadora</button><button data-v="dado">Me lo dijo él</button></div>
+  </div>
+  <div class="card">
+    <h2>📦 Lo que quedó (botellas exactas)</h2>
+    <div class="mut mb">Aquí no se usa la regla de la mitad: cuenta cada botella llena suelta.</div>
+    <label>🍺 Cerveza</label>
+    <div class="g2 mb"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.fin.cerv.c"></div><div><label>+ Botellas llenas sueltas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.fin.cerv.s"></div></div>
+    <label>🥤 Gaseosa</label>
+    <div class="g2"><div><label>Cajas llenas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.fin.gas.c"></div><div><label>+ Botellas llenas sueltas</label><input type="text" inputmode="numeric" autocomplete="off" data-k="a.fin.gas.s"></div></div>
+  </div>
+  <div class="card">
+    <h2>💵 Lo que me entregó</h2>
+    <input type="text" inputmode="decimal" autocomplete="off" data-k="a.entregado" placeholder="S/ total (efectivo + Yape)">
+  </div>
+  <div id="audLight"></div>
+  <div class="card"><h2>🧮 Cómo sale la cuenta</h2><ul class="steps" id="audSteps"></ul></div>
+  <button class="btn" onclick="guardarAudit()">💾 Guardar auditoría en el historial</button>
+  <button class="btn g" onclick="limpiarAudit(this)">🧹 Limpiar para otro vendedor</button>
+</section>
+
+<!-- ============ HISTORIAL ============ -->
+<section id="v-hist" class="hide">
+  <div class="card"><h2>📈 Patrón por persona</h2><div id="patron"></div>
+    <div class="mut" style="margin-top:8px"><b>Sobró</b> = lo que entregó por encima del mínimo (agua, Sporade). <b>Monto seguro</b> = cuánto más pudo sacar sin pasar a rojo. Si alguien siempre deja menos que tú (tú sueles dejar +S/20 a +S/25), ahí hay un patrón.</div></div>
+  <div class="card"><h2>🗂️ Registros</h2><div id="lista"></div></div>
+  <div class="card">
+    <h2>💾 Copia de seguridad</h2>
+    <div class="mut mb">Todo se guarda en tu teléfono. Haz una copia de vez en cuando y guárdala en Archivos o mándatela por WhatsApp.</div>
+    <button class="btn" onclick="exportar()">📤 Guardar / enviar copia</button>
+    <button class="btn g" onclick="copiar(JSON.stringify(dump()))">📋 Copiar copia como texto</button>
+    <label style="margin-top:14px">Restaurar desde archivo</label>
+    <input type="file" accept=".json,.txt,application/json,text/plain" onchange="impFile(this)" style="font-size:14px">
+    <label style="margin-top:10px">…o pega aquí el texto de la copia</label>
+    <textarea id="impTxt"></textarea>
+    <button class="btn g" onclick="impTexto()">♻️ Restaurar desde texto</button>
+  </div>
+  <div class="card">
+    <h2>⚙️ Ajustes</h2>
+    <div class="mut mb">Las cajas siempre son de 12 (cerveza) y 24 (gaseosa). Si un campo queda vacío, la app usa el valor normal.</div>
+    <div class="g2 mb"><div><label>Precio cerveza (S/)</label><input type="text" inputmode="decimal" autocomplete="off" data-k="cfg.pC" placeholder="10"></div><div><label>Precio gaseosa/agua/Sporade (S/)</label><input type="text" inputmode="decimal" autocomplete="off" data-k="cfg.pG" placeholder="3"></div></div>
+    <div class="g2"><div><label>🟢 Verde si falta hasta (S/)</label><input type="text" inputmode="decimal" autocomplete="off" data-k="cfg.verde" placeholder="20"></div><div><label>🔴 Rojo si falta más de (S/)</label><input type="text" inputmode="decimal" autocomplete="off" data-k="cfg.rojo" placeholder="50"></div></div>
+  </div>
+</section>
+
+<nav>
+  <button data-v="ini"><span>📦</span>Inicio</button>
+  <button data-v="cena"><span>🍗</span>Cena</button>
+  <button data-v="vuelto"><span>💵</span>Vuelto</button>
+  <button data-v="cierre"><span>📋</span>Cierre</button>
+  <button data-v="aud"><span>🕵️</span>Auditar</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= estado y guardado ================= */
+const KEY='barra_app_v2';
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const hoy=()=>ymd(new Date());
+/* "jornada": hasta las 8 a.m. sigue contando como la noche anterior (los eventos terminan de madrugada) */
+const jornada=()=>ymd(new Date(Date.now()-8*3600e3));
+const box=(c,s)=>({c:c,s:s});
+const boxT=(c,s,t)=>({c:c,s:s,t:t});
+const blankNoche=()=>({fecha:jornada(),ini:{cerv:boxT(10,0,10),gas:boxT(10,0,10),yape:'',sencillo:''},cena:{p:'',a:'',f:'propio'},fin:{cerv:box('',''),gas:box('',''),agua:'',yape:'',efe:''},mov:[]});
+const blankAudit=()=>({nombre:'',ini:{cerv:box(10,0),gas:box(10,0)},cena:{p:'',a:'',f:'propio'},fin:{cerv:box('',''),gas:box('','')},entregado:'',mov:[]});
+const DEF_CFG={pC:10,pG:3,verde:20,rojo:50};
+const CAJA_C=12,CAJA_G=24; /* una caja nunca cambia */
+let S={cfg:{...DEF_CFG},n:blankNoche(),a:blankAudit(),hist:[],vista:'vuelto',nDirty:false,v:null};
+try{const g=JSON.parse(localStorage.getItem(KEY)||'null');if(g){S=Object.assign(S,g);S.cfg=Object.assign({...DEF_CFG},g.cfg||{});}}catch(e){}
+/* migraciones de versiones anteriores */
+try{['cerv','gas'].forEach(k=>{if(S.n.ini[k].t===undefined)S.n.ini[k].t=10});if(!Array.isArray(S.n.mov))S.n.mov=[];if(!Array.isArray(S.a.mov))S.a.mov=[]}catch(e){}
+try{if((S.cfgV||0)<2){S.cfg.verde=20;S.cfg.rojo=50;delete S.cfg.cajaC;delete S.cfg.cajaG;S.cfgV=2}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+
+const $=id=>document.getElementById(id);
+/* lee números escritos con coma o punto ("224,50", "224.50", "1.250,50", "S/ 30") */
+const P=v=>{
+  if(v===null||v===undefined)return NaN;if(typeof v==='number')return isFinite(v)?v:NaN;
+  let t=String(v).trim().replace(/s\/|\s/gi,'');if(t==='')return NaN;
+  if(t.includes(',')&&t.includes('.')){const k=Math.max(t.lastIndexOf(','),t.lastIndexOf('.'));t=t.slice(0,k).replace(/[.,]/g,'')+'.'+t.slice(k+1)}
+  else t=t.replace(/,/g,'.');
+  return parseFloat(t)};
+const N=v=>{const n=P(v);return isNaN(n)?0:n};
+/* ajustes con red de seguridad: vacío o inválido = valor normal */
+function cfg(){const c=S.cfg||{},g=(k,min)=>{const n=P(c[k]);return(isNaN(n)||n<min)?DEF_CFG[k]:n};
+  const pC=g('pC',0.01),pG=g('pG',0.01),verde=g('verde',0);let rojo=g('rojo',0);if(rojo<verde)rojo=verde;
+  return{cajaC:CAJA_C,cajaG:CAJA_G,pC,pG,verde,rojo}}
+const r2=n=>Math.round(n*100)/100;
+const sg=n=>n>=0?'+'+sol(n):'−'+sol(-n);
+const sol=n=>'S/ '+r2(n).toLocaleString('es-PE',{minimumFractionDigits:0,maximumFractionDigits:2});
+const pl=(n,a,b)=>n+' '+(Math.abs(n)===1?a:b);
+const getK=p=>p.split('.').reduce((o,k)=>o==null?o:o[k],S);
+const setK=(p,v)=>{const ks=p.split('.');let o=S;ks.slice(0,-1).forEach(k=>o=o[k]);o[ks[ks.length-1]]=v};
+const clone=o=>JSON.parse(JSON.stringify(o));
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2000)}
+function copiar(t){
+  const ok=()=>toast('¡Copiado!');
+  const fallback=()=>{const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy')?ok():toast('Mantén presionado el texto para copiar')}catch(e){toast('Mantén presionado el texto para copiar')}ta.remove()};
+  try{navigator.clipboard.writeText(t).then(ok,fallback)}catch(e){fallback()}
+}
+/* botón que pide doble toque (sin ventanas emergentes) */
+function confirmar(btn,fn,msg){
+  if(btn.dataset.arm){delete btn.dataset.arm;btn.textContent=btn.dataset.orig;fn();return}
+  btn.dataset.orig=btn.textContent;btn.dataset.arm=1;btn.textContent=msg||'Toca otra vez para confirmar';
+  setTimeout(()=>{if(btn.dataset.arm){delete btn.dataset.arm;btn.textContent=btn.dataset.orig}},3500);
+}
+const fechaOk=f=>/^\d{4}-\d{2}-\d{2}$/.test(f||'');
+function fechaTxt(f){
+  if(!fechaOk(f))return'Sin fecha';
+  const[y,m,d]=f.split('-').map(Number);const dt=new Date(y,m-1,d);
+  let w='';try{w=dt.toLocaleDateString('es-PE',{weekday:'short'}).replace('.','')}catch(e){}
+  return (w?w.charAt(0).toUpperCase()+w.slice(1)+' ':'')+String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0');
+}
+
+/* ================= navegación ================= */
+const TIT={ini:'📦 Inicio',cena:'🍗 Cena',vuelto:'💵 Vuelto',cierre:'📋 Cierre',aud:'🕵️ Auditoría',hist:'📁 Historial'};
+function go(v){if(!TIT[v])v='vuelto';S.vista=v;save();
+  Object.keys(TIT).forEach(k=>$('v-'+k).classList.toggle('hide',k!==v));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('ttl').textContent=TIT[v];render();window.scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+
+/* ================= enlazar campos ================= */
+function bindAll(){
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    const v=getK(el.dataset.k);el.value=(v===undefined||v===null)?'':v;
+    el.oninput=()=>{setK(el.dataset.k,el.value);if(el.dataset.k.startsWith('n.'))S.nDirty=true;save();render()}
+  });
+  document.querySelectorAll('[data-seg]').forEach(sg=>{
+    const k=sg.dataset.seg;
+    sg.querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('on',(getK(k)??'')===b.dataset.v);
+      b.onclick=()=>{setK(k,b.dataset.v);if(k.startsWith('n.'))S.nDirty=true;save();bindAll();render()}
+    })
+  });
+}
+
+/* ================= cálculos base ================= */
+const bot=(b,caja)=>N(b.c)*caja+N(b.s);
+function partir(b,caja){return{c:Math.floor(b/caja),s:b%caja}}
+function cenaBot(cena){return Math.max(0,Math.round(N(cena.p)+N(cena.a)))}
+
+/* ---- cajas que llegaron / se prestaron ---- */
+const PN={cerv:'cerveza',gas:'gaseosa'};
+function movNet(arr,p){return(arr||[]).filter(x=>x.p===p).reduce((s,x)=>s+(x.d==='in'?1:-1)*N(x.n),0)}
+function movLinea(x){const n=N(x.n);
+  const v=x.d==='in'?(n===1?'Llegó':'Llegaron'):(n===1?'Se prestó':'Se prestaron');
+  return`${v} ${pl(n,'caja','cajas')} de ${PN[x.p]}${x.l?' – '+x.l:''}`}
+const MF={n:{p:'cerv',d:'in',k:'1',l:''},a:{p:'cerv',d:'in',k:'1',l:''}};
+function movRender(base){
+  const arr=S[base].mov||[],m=MF[base],box=$('movBox-'+base);
+  $('movSum-'+base).innerHTML=`<span>↔️ Cajas que llegaron o se prestaron</span><span class="mut" style="font-weight:600">${arr.length?arr.length+' anotad'+(arr.length===1?'a':'as'):'opcional'}</span>`;
+  if(arr.length&&!box.dataset.seen){box.open=true;box.dataset.seen=1}
+  const seg=(f,v,t)=>`<button class="${m[f]===v?'on':''}" onclick="mfSet('${base}','${f}','${v}')">${t}</button>`;
+  $('movBody-'+base).innerHTML=`<div class="mut mb">Solo cajas llenas. Si cambias una caja caliente por una fría, no anotes nada: es lo mismo.</div>
+    <div class="seg mb">${seg('d','in','⬇️ Llegó')}${seg('d','out','⬆️ Se prestó')}</div>
+    <div class="seg mb">${seg('p','cerv','🍺 Cerveza')}${seg('p','gas','🥤 Gaseosa')}</div>
+    <div class="g2"><div><label>Cajas</label><input type="text" inputmode="numeric" autocomplete="off" value="${esc(m.k)}" oninput="MF.${base}.k=this.value"></div><div><label>${m.d==='in'?'¿De dónde?':'¿A dónde?'}</label><input type="text" autocomplete="off" value="${esc(m.l)}" placeholder="3er piso" oninput="MF.${base}.l=this.value" style="font-size:17px"></div></div>
+    <button class="btn g" onclick="movAdd('${base}')">➕ Anotar</button>
+    ${arr.length?'<div style="margin-top:8px">'+arr.map((x,i)=>`<div class="mv"><span>${x.d==='in'?'⬇️':'⬆️'} ${esc(movLinea(x))}</span><button onclick="movDel('${base}',${i})">quitar</button></div>`).join('')+'</div>':''}`;
+}
+function mfSet(base,f,v){MF[base][f]=v;movRender(base)}
+function movAdd(base){const m=MF[base],n=Math.round(N(m.k));
+  if(n<=0){toast('Pon cuántas cajas');return}
+  S[base].mov.push({p:m.p,d:m.d,n:n,l:m.l.trim()});m.k='1';m.l='';
+  if(base==='n')S.nDirty=true;save();render();toast('Anotado')}
+function movDel(base,i){S[base].mov.splice(i,1);if(base==='n')S.nDirty=true;save();render()}
+
+/* ---- núcleo de auditoría: sirve para mí y para otros ---- */
+function auditar(ini,cena,fin,entregado,mov){
+  const C=cfg(),cc=C.cajaC,cg=C.cajaG,r={};
+  r.cIni=bot(ini.cerv,cc);r.cMov=movNet(mov,'cerv')*cc;r.cFin=bot(fin.cerv,cc);r.cVen=r.cIni+r.cMov-r.cFin;r.cPlata=r.cVen*N(C.pC);
+  r.gIni=bot(ini.gas,cg);r.gMov=movNet(mov,'gas')*cg;r.gFin=bot(fin.gas,cg);r.gCena=cenaBot(cena);r.gVen=r.gIni+r.gMov-r.gCena-r.gFin;r.gPlata=r.gVen*N(C.pG);
+  r.min=r2(r.cPlata+r.gPlata);r.ent=r2(N(entregado));r.dif=r2(r.ent-r.min);
+  r.color=r.dif>=-N(C.verde)?'verde':(r.dif>=-N(C.rojo)?'naranja':'rojo');
+  r.pisoVerde=r.min-N(C.verde);r.pisoRojo=r.min-N(C.rojo);
+  r.hastaVerde=Math.max(0,r2(r.ent-r.pisoVerde));r.hastaRojo=Math.max(0,r2(r.ent-r.pisoRojo));
+  r.neg=r.cVen<0||r.gVen<0;r.fuente=cena.f;
+  return r;
+}
+function movTxt(m){return m>0?` + ${m} que llegaron = `:m<0?` − ${-m} que se prestaron = `:''}
+function stepsAudit(r,quien){
+  const C=cfg(),L=[];
+  const ci=r.cMov?`${r.cIni}${movTxt(r.cMov)}${r.cIni+r.cMov}`:`${r.cIni}`;
+  const gi=r.gMov?`${r.gIni}${movTxt(r.gMov)}${r.gIni+r.gMov}`:`${r.gIni}`;
+  L.push(`🍺 <b>Cerveza:</b> había ${ci} botellas y quedaron ${r.cFin}. Se vendieron <b>${r.cVen}</b> × ${sol(N(C.pC))} = <b>${sol(r.cPlata)}</b>`);
+  L.push(`🥤 <b>Gaseosa:</b> había ${gi}, se abrieron ${r.gCena} gratis en la cena y quedaron ${r.gFin}. Se vendieron <b>${r.gVen}</b> × ${sol(N(C.pG))} = <b>${sol(r.gPlata)}</b>`);
+  L.push(`📌 <b>Mínimo que ${quien} entregar:</b> ${sol(r.cPlata)} + ${sol(r.gPlata)} = <b>${sol(r.min)}</b>`);
+  if(r.dif>=0)L.push(`💵 <b>Entregó ${sol(r.ent)}</b>: sobran <b>${sol(r.dif)}</b> por encima del mínimo (eso sería agua, Sporade u otros de ${sol(N(C.pG))}).`);
+  else L.push(`💵 <b>Entregó ${sol(r.ent)}</b>: faltan <b>${sol(-r.dif)}</b> para llegar al mínimo.`);
+  if(r.color==='rojo')L.push(`💸 <b>Monto seguro:</b> ya no queda. Para no salir en rojo tenía que entregar al menos ${sol(r.pisoRojo)} y entregó ${sol(r.pisoRojo-r.ent)} menos.`);
+  else if(r.color==='naranja')L.push(`💸 <b>Monto seguro:</b> ya está en naranja. Pudo sacar hasta <b>${sol(r.hastaRojo)}</b> más sin pasar a rojo. Mientras entregue al menos ${sol(r.pisoRojo)}, nunca sale en rojo.`);
+  else L.push(`💸 <b>Monto seguro:</b> con esta cuenta, pudo sacar hasta <b>${sol(r.hastaVerde)}</b> sin salir de verde y hasta <b>${sol(r.hastaRojo)}</b> sin pasar a rojo. Mientras entregue al menos ${sol(r.pisoRojo)}, nunca sale en rojo.`);
+  return L;
+}
+function stepsTxt(L){return L.map(x=>'• '+x.replace(/<[^>]+>/g,'')).join('\n')}
+function lightHTML(r,quien){
+  const C=cfg();
+  const T={verde:['🟢 Cuadra',r.dif>=0?'La cuenta está en orden.':'Faltan '+sol(-r.dif)+', dentro del margen normal.'],naranja:['🟠 No cuadra del todo','Faltan '+sol(-r.dif)+'. Pregunta qué pasó.'],rojo:['🔴 Falta plata','Faltan '+sol(-r.dif)+'. Es demasiado para ser un error.']}[r.color];
+  const seguro=r.color==='rojo'?`💸 Se pasó del límite de rojo por <b>${sol(r.pisoRojo-r.ent)}</b>`:`💸 Monto seguro: pudo sacar hasta <b>${sol(r.hastaRojo)}</b> sin pasar a rojo`;
+  let h=`<div class="light ${r.color}"><div class="dot"></div><div><div class="t1">${T[0]}</div><div class="t2">${T[1]}</div><div class="t2" style="margin-top:6px;font-size:15px;color:#fff">${seguro}</div></div></div>`;
+  h+=`<div class="mut" style="margin:-4px 2px 10px">Criterio: 🟢 falta hasta ${sol(C.verde)} · 🟠 de ${sol(C.verde)} a ${sol(C.rojo)} · 🔴 más de ${sol(C.rojo)}</div>`;
+  if(r.fuente==='dado')h+=`<div class="warn">⚠️ El número de la cena te lo dio ${quien==='yo'?'otra persona':'el vendedor'}. Cada persona de más que diga esconde ${sol(C.pG)} y el semáforo no lo ve.</div>`;
+  if(r.neg)h+=`<div class="warn">⚠️ Sale un número negativo de botellas vendidas. Revisa el conteo o el número de la cena.</div>`;
+  return h;
+}
+
+/* ================= aviso de noche vieja ================= */
+let bannerOff=false;
+function hasData(){const n=S.n;return[n.fin.cerv.c,n.fin.gas.c,n.fin.yape,n.fin.efe,n.cena.p,n.ini.yape,n.ini.sencillo].some(v=>v!==''&&v!==undefined&&v!==null)||(n.mov||[]).length>0}
+function isSaved(){return!S.nDirty&&S.hist.some(h=>h.id==='n-'+S.n.fecha)}
+function bannerRender(){
+  const el=$('banner'),f=S.n.fecha;
+  if(bannerOff||!fechaOk(f)||f>=jornada()){el.innerHTML='';return}
+  const saved=isSaved(),data=hasData();
+  let h=`<div class="banner">📅 Tienes abierta la noche del <b>${fechaTxt(f)}</b>${saved?' (ya está guardada)':data?' y <b>no está guardada</b>':''}.`;
+  if(saved||!data)h+=`<button class="btn" onclick="resetNoche()">Empezar la noche de hoy</button>`;
+  else h+=`<button class="btn" onclick="guardarNoche();resetNoche()">💾 Guardar y empezar la de hoy</button><button class="btn r" onclick="confirmar(this,resetNoche,'Toca otra vez: se borra sin guardar')">Empezar sin guardar</button>`;
+  h+=`<button class="btn g" onclick="bannerOff=true;bannerRender()">Seguir con esa noche</button></div>`;
+  el.innerHTML=h;
+}
+function resetNoche(){S.n=blankNoche();S.nDirty=false;bannerOff=false;save();bindAll();render();toast('Noche nueva lista')}
+function nuevaNoche(btn){confirmar(btn,resetNoche,hasData()&&!isSaved()?'⚠️ No está guardada: toca otra vez para borrarla':'Toca otra vez para confirmar')}
+
+/* ================= vistas ================= */
+function render(){
+  bannerRender();
+  const v=S.vista,C=cfg();
+  if(v==='ini'){
+    const cc=C.cajaC,cg=C.cajaG,c=bot(S.n.ini.cerv,cc),g=bot(S.n.ini.gas,cg);
+    $('iniRes').innerHTML=`En total: 🍺 <b>${c}</b> cervezas · 🥤 <b>${g}</b> gaseosas.`;
+  }
+  if(v==='cena')cenaRender();
+  if(v==='vuelto')vRender();
+  if(v==='cierre')cierreRender();
+  if(v==='aud')audRender();
+  if(v==='hist')histRender();
+}
+function cenaRender(){
+  const C=cfg(),n=S.n.cena,p=N(n.p),a=N(n.a),b=cenaBot(n),cg=C.cajaG,{c,s}=partir(b,cg);
+  if(!b){$('cenaRes').innerHTML='<div class="mut">Escribe el número de personas.</div>';return}
+  let h=`<div class="mut">${p} personas + ${a} adicionales = <b>${b} gaseosas</b></div><div class="big">${pl(c,'caja','cajas')}${s?'<br>+ '+pl(s,'botella','botellas'):''}</div>`;
+  h+=`<ul class="steps" style="margin-top:8px"><li>Cada caja trae ${cg}. ${c} × ${cg} = ${c*cg}.</li>`;
+  if(s)h+=`<li>Faltan ${b} − ${c*cg} = <b>${s}</b>, que salen de la caja ${c+1}.</li><li>A esa caja ${c+1} le quedan <b>${cg-s}</b> botellas para vender.</li>`;
+  else h+=`<li>Es exacto: no tienes que abrir otra caja.</li>`;
+  h+=`<li>Estas ${b} no se cobran y se descuentan solas en el cierre.</li></ul>`;
+  $('cenaRes').innerHTML=h;
+}
+
+/* ---- vuelto (se guarda en el teléfono por si la app se recarga) ---- */
+let V=Object.assign({g:0,c:0,pago:0,pasos:[]},S.v||{});if(!Array.isArray(V.pasos))V.pasos=[];
+function vSave(){S.v=V;save()}
+function vq(k,d){V[k]=Math.max(0,V[k]+d);vSave();vRender()}
+function vb(x){V.pago+=x;V.pasos.push(x);vSave();vRender()}
+function vUndo(){if(!V.pasos.length)return;V.pago=Math.max(0,V.pago-V.pasos.pop());vSave();vRender()}
+function vPagoReset(){V.pago=0;V.pasos=[];vSave();vRender()}
+function vReset(){V={g:0,c:0,pago:0,pasos:[]};vSave();vRender()}
+function vRender(){
+  const C=cfg(),pg=C.pG,pc=C.pC;
+  document.querySelectorAll('.pg').forEach(e=>e.textContent=pg);document.querySelectorAll('.pc').forEach(e=>e.textContent=pc);
+  $('qg').textContent=V.g;$('qc').textContent=V.c;
+  const tot=r2(V.g*pg+V.c*pc),vu=r2(V.pago-tot);
+  $('vTot').textContent=sol(tot);$('vPag').textContent=sol(V.pago);
+  $('vVu').textContent=V.pago?(vu<0?'Falta '+sol(-vu):sol(vu)):'S/ 0';$('vVu').classList.toggle('neg',vu<0);
+  let e=[];if(V.g)e.push(`${V.g} × ${pg} = ${r2(V.g*pg)}`);if(V.c)e.push(`${V.c} × ${pc} = ${r2(V.c*pc)}`);
+  let t=e.join('  ·  ');
+  if(V.pasos.length>1)t+=`<br>Pagó: ${V.pasos.join(' + ')} = ${V.pago}`;
+  if(V.pago&&tot)t+=`<br>${V.pago} − ${tot} = <b>${vu}</b>`;
+  $('vExp').innerHTML=t||'Marca lo que lleva y toca los billetes.';
+}
+
+/* ---- cierre ---- */
+function cajasReporte(ini,fin,caja,net){
+  const base=(ini.t!==undefined&&ini.t!=='')?N(ini.t):N(ini.c)+(N(ini.s)>0?1:0);
+  const total=Math.max(0,base+net);
+  const s=N(fin.s),extra=caja>0?Math.floor(s/caja):0,rem=caja>0?s%caja:s;
+  const media=rem>0&&rem>=caja/2;
+  const llenas=N(fin.c)+extra+(media?1:0);
+  return{base,net,total,llenas,vacias:Math.max(0,total-llenas),s,extra,rem,cuenta:rem>0?(media?'llena':'vacía'):null};
+}
+const llTxt=(n,a,b)=>`${n} ${n===1?a:b}`;
+function cierreCalc(){
+  const n=S.n,C=cfg(),mov=n.mov||[];
+  const yape=r2(N(n.fin.yape)-N(n.ini.yape)),efe=r2(N(n.fin.efe)-N(n.ini.sencillo)),tot=r2(yape+efe);
+  const kc=cajasReporte(n.ini.cerv,n.fin.cerv,C.cajaC,movNet(mov,'cerv')),kg=cajasReporte(n.ini.gas,n.fin.gas,C.cajaG,movNet(mov,'gas'));
+  const r=auditar(n.ini,n.cena,n.fin,tot,mov);
+  let rep=`📋 Reporte – ${fechaTxt(n.fecha)}\n🥤 Gaseosa: ${llTxt(kg.llenas,'llena','llenas')} / ${llTxt(kg.vacias,'vacía','vacías')}\n🍺 Cerveza: ${llTxt(kc.llenas,'llena','llenas')} / ${llTxt(kc.vacias,'vacía','vacías')}\n`;
+  mov.forEach(x=>rep+='↔️ '+movLinea(x)+'\n');
+  if(n.fin.agua==='si')rep+='💧 Agua: sí hay\n';if(n.fin.agua==='no')rep+='💧 Agua: no hay\n';
+  rep+=`💵 Efectivo: ${sol(efe)}\n📱 Yape: ${sol(yape)}\n✅ Total: ${sol(tot)}`;
+  return{yape,efe,tot,kc,kg,r,rep};
+}
+function cierreSteps(x){
+  const n=S.n,C=cfg(),L=[];
+  L.push(`📱 <b>Yape de la noche:</b> ${sol(N(n.fin.yape))} ahora − ${sol(N(n.ini.yape))} que ya tenías = <b>${sol(x.yape)}</b>`);
+  L.push(`💵 <b>Efectivo de la noche:</b> ${sol(N(n.fin.efe))} en mano − ${sol(N(n.ini.sencillo))} de tu sencillo = <b>${sol(x.efe)}</b>`);
+  L.push(`✅ <b>Total:</b> ${sol(x.yape)} + ${sol(x.efe)} = <b>${sol(x.tot)}</b>`);
+  const cj=(k,nm,caja)=>{
+    let t=`${nm}: de ${k.total} cajas${k.net?` (${k.base} ${k.net>0?'+ '+k.net+' que llegaron':'− '+(-k.net)+' que se prestaron'})`:''} → <b>${llTxt(k.llenas,'llena','llenas')}</b> y <b>${llTxt(k.vacias,'vacía','vacías')}</b>.`;
+    if(k.extra)t+=` Las ${k.s} sueltas = ${pl(k.extra,'caja completa','cajas completas')}${k.rem?' + '+k.rem+' botellas':''}.`;
+    if(k.cuenta)t+=` La incompleta tiene ${k.rem} de ${caja} llenas → cuenta como ${k.cuenta}.`;
+    return t};
+  L.push('📦 '+cj(x.kg,'<b>Gaseosa</b>',C.cajaG));L.push('📦 '+cj(x.kc,'<b>Cerveza</b>',C.cajaC));
+  return L;
+}
+function cierreRender(){
+  const n=S.n,x=cierreCalc();
+  movRender('n');
+  $('cierreSteps').innerHTML=cierreSteps(x).map(l=>'<li>'+l+'</li>').join('');
+  const lleno=n.fin.cerv.c!==''&&n.fin.gas.c!==''&&(n.fin.yape!==''||n.fin.efe!=='');
+  $('cierreLight').innerHTML=lleno?`<div class="card"><h2>🧾 Mi propio control</h2>${lightHTML(x.r,'yo')}<ul class="steps">${stepsAudit(x.r,'debes').map(l=>'<li>'+l+'</li>').join('')}</ul></div>`:'';
+  $('rep').textContent=x.rep;
+}
+function guardarNoche(){
+  if(!fechaOk(S.n.fecha)){S.n.fecha=jornada();bindAll()}
+  const x=cierreCalc(),n=clone(S.n);
+  const det='CUENTA\n'+stepsTxt(cierreSteps(x))+'\n\nCONTROL\n'+stepsTxt(stepsAudit(x.r,'debes'))+'\n\nMENSAJE\n'+x.rep;
+  const id='n-'+n.fecha;
+  const rec={id,tipo:'noche',nombre:'Yo',fecha:n.fecha,datos:n,tot:x.tot,yape:x.yape,efe:x.efe,min:x.r.min,dif:x.r.dif,color:x.r.color,hastaVerde:x.r.hastaVerde,hastaRojo:x.r.hastaRojo,cena:x.r.gCena,det,guardado:new Date().toISOString()};
+  const i=S.hist.findIndex(h=>h.id===id);if(i>=0)S.hist[i]=rec;else S.hist.unshift(rec);
+  S.nDirty=false;save();render();toast(i>=0?'Noche actualizada':'Noche guardada');
+}
+
+/* ---- auditoría ---- */
+function copiarMiNoche(){
+  const n=S.n,x=cierreCalc();
+  S.a.ini={cerv:{c:n.ini.cerv.c,s:n.ini.cerv.s},gas:{c:n.ini.gas.c,s:n.ini.gas.s}};
+  S.a.cena=clone(n.cena);S.a.fin={cerv:clone(n.fin.cerv),gas:clone(n.fin.gas)};
+  S.a.mov=clone(n.mov||[]);S.a.entregado=String(x.tot);
+  const box=$('movBox-a');if(box)delete box.dataset.seen;
+  save();bindAll();render();toast('Copiados todos tus datos: cambia lo que sea distinto en su barra');
+}
+function audRender(){
+  const a=S.a,r=auditar(a.ini,a.cena,a.fin,a.entregado,a.mov);
+  movRender('a');
+  const listo=a.entregado!==''&&a.fin.cerv.c!==''&&a.fin.gas.c!=='';
+  $('audLight').innerHTML=listo?lightHTML(r,'él'):'<div class="card mut">Llena lo que quedó y lo que te entregó: el semáforo aparece solo.</div>';
+  $('audSteps').innerHTML=stepsAudit(r,'debe').map(l=>'<li>'+l+'</li>').join('');
+}
+/* nombres: "Juan", "juan " y "JUÁN" son la misma persona */
+const normName=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+function guardarAudit(){
+  const a=clone(S.a),r=auditar(a.ini,a.cena,a.fin,a.entregado,a.mov);
+  const nombre=(a.nombre||'').replace(/\s+/g,' ').trim()||'Sin nombre';
+  const fecha=fechaOk(S.n.fecha)?S.n.fecha:jornada();
+  const id='a-'+fecha+'-'+(normName(nombre)||'sin nombre');
+  const movTx=(a.mov||[]).length?'\nCajas movidas: '+a.mov.map(movLinea).join('; '):'';
+  const rec={id,tipo:'audit',nombre,fecha,datos:a,tot:r.ent,min:r.min,dif:r.dif,color:r.color,hastaVerde:r.hastaVerde,hastaRojo:r.hastaRojo,cena:r.gCena,fuente:a.cena.f,
+    det:`AUDITORÍA – ${nombre}\nSemáforo: ${r.color.toUpperCase()}\nCena: ${r.gCena} (${a.cena.f==='dado'?'dato que me dio él':'dato propio/coordinadora'})${movTx}\n\n`+stepsTxt(stepsAudit(r,'debe')),guardado:new Date().toISOString()};
+  const i=S.hist.findIndex(h=>h.id===id);
+  if(i>=0){S.hist.splice(i,1);S.hist.unshift(rec)}else S.hist.unshift(rec);
+  save();toast(i>=0?'Auditoría de '+nombre+' actualizada':'Auditoría guardada');
+}
+function limpiarAudit(btn){confirmar(btn,()=>{const keep={ini:S.a.ini,cena:S.a.cena,mov:S.a.mov};S.a=blankAudit();Object.assign(S.a,keep);save();bindAll();render()})}
+
+/* ---- historial ---- */
+function histRender(){
+  const C=cfg(),g={};
+  /* monto seguro = dif + límite de rojo (con el criterio actual, para comparar parejo) */
+  const seg=h=>Math.max(0,r2((Number(h.dif)||0)+C.rojo));
+  S.hist.forEach(h=>{const k=normName(h.nombre)||'sin nombre';(g[k]=g[k]||{nombre:h.nombre||'Sin nombre',d:[],s:[]});g[k].d.push(Number(h.dif)||0);g[k].s.push(seg(h))});
+  const ks=Object.keys(g),avg=a=>r2(a.reduce((x,y)=>x+y,0)/a.length);
+  if(!ks.length)$('patron').innerHTML='<div class="mut">Aún no hay registros guardados.</div>';
+  else $('patron').innerHTML='<table><tr><th>Persona</th><th>Noches</th><th>Sobró prom.</th><th>Monto seguro prom.</th></tr>'+ks.map(k=>{
+    const d=g[k].d,p=avg(d);
+    return`<tr><td>${esc(g[k].nombre)}</td><td>${d.length}</td><td><span style="color:${p<0?'var(--bad)':'var(--ok)'}">${sg(p)}</span>${d.length>1?`<br><span class="mut">${sg(Math.min(...d))} a ${sg(Math.max(...d))}</span>`:''}</td><td>${sol(avg(g[k].s))}</td></tr>`}).join('')+'</table>';
+  $('lista').innerHTML=S.hist.length?S.hist.map((h,i)=>`
+    <div class="hi"><div class="top" onclick="tog(${i})"><div><div class="tt">${h.tipo==='noche'?'📋 Mi noche':'🕵️ '+esc(h.nombre)}</div><div class="mut">${fechaTxt(h.fecha)} · entregó ${sol(h.tot)} · sobró ${sg(h.dif)} · seguro ${sol(seg(h))}</div></div><span class="pill ${h.color||'n'}">${esc((h.color||'').toUpperCase())}</span></div>
+    <div id="d${i}" class="hide" style="margin-top:10px"><pre>${esc(h.det||'')}</pre>
+    <button class="btn g" onclick="copiar(S.hist[${i}].det)">📋 Copiar detalle</button>
+    <button class="btn r" onclick="borrar(this,${i})">🗑️ Borrar registro</button></div></div>`).join(''):'<div class="mut">Guarda tu noche desde Cierre o una auditoría desde Auditar.</div>';
+}
+function tog(i){$('d'+i).classList.toggle('hide')}
+function borrar(btn,i){confirmar(btn,()=>{S.hist.splice(i,1);save();render()})}
+function dump(){return{app:'barra',v:4,exportado:new Date().toISOString(),cfg:S.cfg,hist:S.hist}}
+/* copia: en el iPhone abre el menú Compartir (Guardar en Archivos, WhatsApp...) */
+async function exportar(){
+  const txt=JSON.stringify(dump(),null,1),name='barra-copia-'+hoy()+'.txt';
+  let enMarco=false;try{enMarco=window.self!==window.top}catch(e){enMarco=true}
+  if(enMarco){copiar(txt);toast('Copiada como texto (dentro de Claude no se pueden guardar archivos)');return}
+  try{
+    const file=new File([txt],name,{type:'text/plain'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Copia de Barra'});return}
+  }catch(e){if(e&&e.name==='AbortError')return}
+  try{const u=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Copia descargada')}
+  catch(e){copiar(txt)}
+}
+function importar(txt){
+  try{const d=JSON.parse(txt);if(!d||!Array.isArray(d.hist))throw 0;
+    const ids=new Set(S.hist.map(h=>h.id));let n=0;d.hist.forEach(h=>{if(h&&h.id&&!ids.has(h.id)){S.hist.push(h);n++}});
+    S.hist.sort((a,b)=>(b.guardado||'').localeCompare(a.guardado||''));if(d.cfg){['pC','pG'].forEach(k=>{if(d.cfg[k]!==undefined)S.cfg[k]=d.cfg[k]});if((d.v||0)>=4)['verde','rojo'].forEach(k=>{if(d.cfg[k]!==undefined)S.cfg[k]=d.cfg[k]})}
+    save();bindAll();render();toast(n+' registros restaurados')}catch(e){toast('Ese texto no es una copia válida')}
+}
+function impFile(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{importar(r.result);inp.value=''};r.readAsText(f)}
+function impTexto(){importar($('impTxt').value)}
+
+/* ================= arranque ================= */
+bindAll();go(S.vista||'vuelto');
+if('serviceWorker' in navigator){try{
+  const had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had)$('upd').innerHTML='<div class="banner">🔄 Hay una versión nueva de la app.<button class="btn" onclick="location.reload()">Actualizar ahora</button></div>'});
+}catch(e){}}
+</script>
+</body>
+</html>
