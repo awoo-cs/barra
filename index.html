@@ -13,7 +13,8 @@
 <title>Barra</title>
 <style>
 :root{--bg:#0f1115;--card:#1a1d24;--line:#2a2f3a;--tx:#eef0f4;--mut:#9aa3b2;--acc:#f5b301;--ok:#3ecf8e;--warn:#ff9f1c;--bad:#ff5c5c}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button,nav,summary,.q,.big,.num,.lab,.prod .nm{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 body{padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 92px)}
 header{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 12px}
@@ -27,7 +28,7 @@ nav button.on{color:#111;background:var(--acc)}
 .card h2{font-size:16px;margin:0 0 10px}
 label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
 input,textarea{width:100%;padding:12px;font-size:20px;border-radius:12px;border:1px solid var(--line);background:#0c0e12;color:var(--tx);font-family:inherit}
-textarea{font-size:13px;min-height:90px}
+textarea{font-size:16px;min-height:90px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.g3 input{font-size:18px;padding:11px 8px}
 .mb{margin-bottom:10px}
@@ -232,7 +233,7 @@ th{color:var(--mut);font-weight:600;font-size:12px}
     <button class="btn" onclick="exportar()">📤 Guardar / enviar copia</button>
     <button class="btn g" onclick="copiar(JSON.stringify(dump()))">📋 Copiar copia como texto</button>
     <label style="margin-top:14px">Restaurar desde archivo</label>
-    <input type="file" accept=".json,.txt,application/json,text/plain" onchange="impFile(this)" style="font-size:14px">
+    <input type="file" accept=".json,.txt,application/json,text/plain" onchange="impFile(this)" style="font-size:16px">
     <label style="margin-top:10px">…o pega aquí el texto de la copia</label>
     <textarea id="impTxt"></textarea>
     <button class="btn g" onclick="impTexto()">♻️ Restaurar desde texto</button>
@@ -452,8 +453,11 @@ function cenaRender(){
 }
 
 /* ---- vuelto (se guarda en el teléfono por si la app se recarga) ---- */
-let V=Object.assign({g:0,c:0,pago:0,pasos:[]},S.v||{});if(!Array.isArray(V.pasos))V.pasos=[];
-function vSave(){S.v=V;save()}
+const KEYV='barra_vuelto_v1';
+let V={g:0,c:0,pago:0,pasos:[]};
+try{Object.assign(V,JSON.parse(localStorage.getItem(KEYV)||'null')||S.v||{})}catch(e){}
+if(!Array.isArray(V.pasos))V.pasos=[];if(S.v){delete S.v;save()}
+function vSave(){try{localStorage.setItem(KEYV,JSON.stringify(V))}catch(e){}}
 function vq(k,d){V[k]=Math.max(0,V[k]+d);vSave();vRender()}
 function vb(x){V.pago+=x;V.pasos.push(x);vSave();vRender()}
 function vUndo(){if(!V.pasos.length)return;V.pago=Math.max(0,V.pago-V.pasos.pop());vSave();vRender()}
